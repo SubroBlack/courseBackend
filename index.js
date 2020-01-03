@@ -37,6 +37,15 @@ app.get("/info", (req, res) => {
     <p>${Date()}</p>`);
 });
 
+app.get("/api/persons/:id", (req, res) => {
+  const result = persons.filter(person => person.id === Number(req.params.id));
+  if (result.length === 0) {
+    res.status(404).end();
+  } else if (result.length > 0) {
+    res.json(result);
+  }
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

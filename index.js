@@ -55,14 +55,24 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 app.post("/api/persons", (req, res) => {
-  const person = {
-    name: req.body.name,
-    number: req.body.number,
-    id: Math.floor(Math.random() * 10000)
-  };
-  console.log(person);
-  persons.concat(person);
-  res.json(person);
+  if (req.body.name && req.body.number) {
+    if (persons.filter(person => person.name === req.body.name).length === 0) {
+      const person = {
+        name: req.body.name,
+        number: req.body.number,
+        id: Math.floor(Math.random() * 10000)
+      };
+      console.log(person);
+      persons.concat(person);
+      res.status(200).json(person);
+    } else {
+      const error = { error: "name must be unique" };
+      res.status(400).json(error);
+    }
+  } else {
+    const error = { error: "name and number cannot be empty" };
+    res.status(400).json(error);
+  }
 });
 
 const PORT = 3001;

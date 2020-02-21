@@ -59,14 +59,13 @@ app.delete("/api/persons/:id", (req, res) => {
 app.post("/api/persons", (req, res) => {
   if (req.body.name && req.body.number) {
     if (persons.filter(person => person.name === req.body.name).length === 0) {
-      const person = {
+      const contact = {
         name: req.body.name,
         number: req.body.number,
         id: Math.floor(Math.random() * 10000)
       };
-      console.log(person);
-      persons.concat(person);
-      res.status(200).json(person);
+      persons = persons.concat(contact);
+      res.status(200).json(contact);
     } else {
       const error = { error: "name must be unique" };
       res.status(400).json(error);

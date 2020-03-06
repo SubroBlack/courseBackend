@@ -1,6 +1,8 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const Contact = require("./models/contact");
 const morgan = require("morgan");
 const cors = require("cors");
 
@@ -46,7 +48,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Contact.find({}).then(result => {
+    res.json(result);
+    mongoose.connection.close();
+  });
 });
 
 app.get("/info", (req, res) => {
@@ -70,25 +75,25 @@ app.delete("/api/persons/:id", (req, res) => {
 
 app.post("/api/persons", (req, res) => {
   if (req.body.name && req.body.number) {
-    if (persons.filter(person => person.name === req.body.name).length === 0) {
-      const contact = {
-        name: req.body.name,
-        number: req.body.number,
-        id: Math.floor(Math.random() * 10000)
-      };
-      persons = persons.concat(contact);
-      res.status(200).json(contact);
-    } else {
-      const error = { error: "name must be unique" };
-      res.status(400).json(error);
-    }
+    const contact = new Contact({
+      name: req.body.name,
+      number: req.body.number
+    });
+
+    contact.save().then(response => {
+      console.log(
+        `Added ${response.name} number ${response.number} to phonebook`
+      );
+      res.json(response.toJSON());
+      mongoose.connection.close();
+    });
   } else {
     const error = { error: "name and number cannot be empty" };
     res.status(400).json(error);
   }
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

@@ -20,29 +20,6 @@ app.use(
 );
 //
 
-let persons = [
-  {
-    name: "Arto Hellas",
-    number: "040-123456",
-    id: 1
-  },
-  {
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-    id: 2
-  },
-  {
-    name: "Mary Poppendieck",
-    number: "12-43-123546",
-    id: 3
-  },
-  {
-    name: "Dan Abramov",
-    number: "39-23-6543210",
-    id: 4
-  }
-];
-
 // Homepage
 app.get("/", (req, res) => {
   res.send("<h1>Hello World</h1>");
@@ -88,20 +65,23 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 // CREATE a new Contact
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   if (req.body.name && req.body.number) {
     const contact = new Contact({
       name: req.body.name,
       number: req.body.number
     });
 
-    contact.save().then(response => {
-      console.log(
-        `Added ${response.name} number ${response.number} to phonebook`
-      );
-      res.json(response.toJSON());
-      mongoose.connection.close();
-    });
+    contact
+      .save()
+      .then(response => {
+        console.log(
+          `Added ${response.name} number ${response.number} to phonebook`
+        );
+        res.json(response.toJSON());
+        mongoose.connection.close();
+      })
+      .catch(error => next(error));
   } else {
     const error = { error: "name and number cannot be empty" };
     res.status(400).json(error);
@@ -133,6 +113,9 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.name === "CastError" && error.kind === "ObjectId") {
     return res.status(400).send({ error: "malformatted id " });
+  } else if (error.name === "ValidationError") {
+    console.log("FROM MY validation handler", error.message);
+    return res.status(400).json({ error: error.message });
   }
   next(error);
 };

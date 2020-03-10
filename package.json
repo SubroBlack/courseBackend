@@ -10,7 +10,8 @@
     "build:ui": "rm -rf build && cd ../FullStack/Part4/phonebook && npm run build --prod && cp -r build ../../../Back/",
     "deploy": "git push heroku master",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy",
-    "logs:prod": "heroku logs --tail"
+    "logs:prod": "heroku logs --tail",
+    "lint": "eslint ."
   },
   "author": "Black",
   "license": "ISC",
@@ -19,9 +20,11 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongoose": "^5.9.3",
+    "mongoose-unique-validator": "^2.0.3",
     "morgan": "^1.9.1"
   },
   "devDependencies": {
+    "eslint": "^6.8.0",
     "nodemon": "^2.0.2"
   }
 }
